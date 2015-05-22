@@ -64,7 +64,7 @@ public:
    /**
    * @brief Apply CRF to label the datas
    */
-  void tag(AnalysisContent& analysis, MediaId lg);
+  OutputTaggerWap tag(AnalysisContent& analysis, MediaId lg);
  /**
    * @brief Load the model to use in CRF
    */

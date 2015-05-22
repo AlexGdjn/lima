@@ -24,8 +24,11 @@
 #include "linguisticProcessing/core/LinguisticResources/AbstractResource.h"
 #include "linguisticProcessing/core/LinguisticResources/LinguisticResources.h"
 
+#include "linguisticProcessing/core/Automaton/constraintFunctionFactory.h"
+
 #include "AbstractTaggerFactory.h"
 #include "TaggerWap.h"
+#include "AddSpecificEntities.h"
 
 using namespace std;
 using namespace Lima::Common::AnnotationGraphs;
@@ -65,7 +68,8 @@ public:
   MediaId m_lg;
   std::vector<mdl_t*> m_vecmod;
 
- 
+  AddSpecificEntities m_addse;
+
 };
  
 SpecificEntitiesCRFTagPrivate::SpecificEntitiesCRFTagPrivate() {
@@ -204,8 +208,25 @@ void SpecificEntitiesCRFTag::init(
     fclose(file);
     m_spt->m_vecmod.push_back(mod);
   }
-   
   
+  std::string id;
+  LimaString complement;
+  std::map<std::string, std::string> normMap;
+   try {
+    normMap=unitConfiguration.getMapAtKey("NormalizeFunctionMap");
+    } catch (Common::XMLConfigurationFiles::NoSuchMap& ) {
+     //LERROR << "no parameter 'NormalizationFunctionMap' in group for language " << (int) m_lg << " !" << LENDL;
+    //throw InvalidConfiguration();
+  }
+   std::map<std::string, std::string>::const_iterator 
+     it=normMap.begin(),
+     it_end=normMap.end();
+   for (;it!=it_end;it++) {
+     id=(*it).second;
+     ConstraintFunction* newConstraint=AbstractConstraintFunctionFactory::getFactory(id)->create(m_spt->m_lg,complement);
+     m_spt->m_addse.insertMap((*it).first, newConstraint);
+   } 
+ 
   
 }
 
@@ -217,7 +238,8 @@ LimaStatusCode SpecificEntitiesCRFTag::process(AnalysisContent& analysis) const
 
   AnalysisGraph* anagraph=static_cast<AnalysisGraph*>(analysis.getData("AnalysisGraph"));
   
-  
+  OutputTaggerWap outpData, resData;
+
   MediaId l;
   LimaString lmS;
   AbstractTagger *abTag;
@@ -232,14 +254,15 @@ LimaStatusCode SpecificEntitiesCRFTag::process(AnalysisContent& analysis) const
     if (abTag!=NULL) {
       abTag->setMod(m_spt->m_vecmod[i]);
       abTag->initOptions(options);
-      abTag->tag(analysis, m_spt->m_lg);
+      outpData=abTag->tag(analysis, m_spt->m_lg);
 
+      resData.add(outpData);
     }
     free(abTag);
     
   }
 
-  
+   m_spt->m_addse.apply(analysis, m_spt->m_lg, resData);
 
 
   return lm;

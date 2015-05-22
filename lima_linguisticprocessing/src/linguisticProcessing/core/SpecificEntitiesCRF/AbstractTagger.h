@@ -35,6 +35,7 @@
 
 #include "SpecificEntitiesCRFExport.h"
 #include "model.h"
+#include "OutputTaggerWap.h"
 
 #include <map>
 #include <string>
@@ -52,7 +53,7 @@ public:
 
   virtual void initOptions(const std::map<std::string, std::string>& options) = 0;
 
-  virtual void tag(AnalysisContent& analysis, MediaId lg) = 0;
+  virtual OutputTaggerWap tag(AnalysisContent& analysis, MediaId lg) = 0;
 
   virtual void setMod(mdl_t *m)=0;
 

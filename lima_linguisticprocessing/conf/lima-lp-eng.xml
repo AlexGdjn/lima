@@ -57,8 +57,8 @@
         <!--item value="srl"/-->
         <!--item value="conllDumper"/-->
         <!--item value="bowDumper"/-->
-        <!--item value="textDumper"/-->
-	<item value="crfSEDumper"/>
+        <item value="textDumper"/>
+	<!--item value="crfSEDumper"/-->
         <!--item value="fullXmlDumper"/-->
         <!--item value="NullDumper"/-->
         <!--item value="temporalXmlDumper"/-->
@@ -538,6 +538,11 @@
        <list name="modelList">
 	<item value="MODEL-NAME-TO-COMPLETE.mod"/>
       </list>
+
+      <map name="NormalizeFunctionMap">
+	<entry key="DateTime.DATE" value="NormalizeDate"/>
+      </map>
+
     </group>
 
 <!-- ******************************************

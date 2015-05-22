@@ -18,7 +18,8 @@ SET(lima-lp-specificentitiesCrf_LIB_SRCS
    AbstractTrainerFactory.cpp
    AbstractTaggerFactory.cpp
    SpecificEntitiesCRFTag.cpp
-   AddSE.cpp
+   AddSpecificEntities.cpp
+   OutputTaggerWap.cpp
    bcd.c
    decoder.c
    gradient.c
@@ -74,7 +75,9 @@ install(FILES
   TaggerWap.h
   TrainerWap.h
   GraphToWap.h
-  AddSE.h
+  AddSpecificEntities.h
+  AbstractCrfPostProcess.h
+  OutputTaggerWap.h
   SpecificEntitiesCRFExport.h
   decoder.h
   gradient.h

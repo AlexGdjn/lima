@@ -31,7 +31,6 @@
 #include "linguisticProcessing/core/AnalysisDumpers/WordFeatureExtractor.h"
 
 #include "GraphToWap.h"
-#include "AddSE.h"
 
 using namespace Lima::LinguisticProcessing::LinguisticAnalysisStructure;
 //using namespace Lima::LinguisticProcessing::Automaton;
@@ -136,7 +135,7 @@ void TaggerWap::initOptions(const std::map<std::string, std::string>& options) {
  
 }
 
-void TaggerWap::tag(AnalysisContent& analysis, MediaId lg) {
+OutputTaggerWap TaggerWap::tag(AnalysisContent& analysis, MediaId lg) {
   
 	// Open input and output files
 	FILE *fin = stdin, *fout = stdout;
@@ -164,6 +163,7 @@ void TaggerWap::tag(AnalysisContent& analysis, MediaId lg) {
 
 	deleteList(lst);
 
+
 	// And close files
 	if (m_tw->m_mod->opt->input != NULL)
 		fclose(fin);
@@ -171,71 +171,15 @@ void TaggerWap::tag(AnalysisContent& analysis, MediaId lg) {
 		fclose(fout);
   
 	listDat_t *ll=ltmp;
-	// add the SpecificEntities founded
 
-	bool isEN=false;
-	int positionDebut=0;
-	int lastPos=0;
-	int lastLength=0;
-	std::string currentEN;
-	std::string currentStr;
-	bool isFirst=true;
+	OutputTaggerWap outp;
+	outp.setDataFromCrf(ltmp);
 
-	if (ltmp!=NULL) {
-	  while (ltmp!=NULL) {
-	    
-	    std::istringstream iss(ltmp->data->type ); 
-	    std::string mot; 
-	    std::vector<std::string> resvalue;
-	    while ( std::getline( iss, mot, '.' ) ) {
-	      resvalue.push_back(mot); 
-	    } 
-	    if (resvalue[1][0]=='B') {
-	      if (!isFirst) {
-		
-		addSpecificEntities(analysis,lg, currentStr , currentEN, positionDebut,(lastPos+lastLength)-positionDebut);
-	      } else {
-		isFirst=false;
-	      }
-	      positionDebut=ltmp->data->pos;
-	      
-	      lastPos=positionDebut;
-	      lastLength=ltmp->data->lgth;
-	      
-	      resvalue[1].replace(0, 2, "");
-	      currentEN=resvalue[0]+"."+resvalue[1];
-	      currentStr=ltmp->data->str;
-	      isEN=true;
-	    } else if (resvalue[1][0]=='I') {
-	      resvalue[1].replace(0, 2, "");
-	      
-	      if (resvalue[0]+"."+resvalue[1]!=currentEN || (ltmp->data->pos>(lastPos+lastLength+1))) {
-		// if we don't start with a B-
-		if (!isFirst) {
-		  addSpecificEntities(analysis,lg, currentStr , currentEN, positionDebut,(lastPos+lastLength)-positionDebut);
-		} else {
-		  isFirst=false;
-		}
-		currentEN=resvalue[0]+"."+resvalue[1];
-		currentStr=currentStr+ltmp->data->str;
-		positionDebut=ltmp->data->pos;
-		
-	      }
-	      lastPos=ltmp->data->pos;
-	      lastLength=ltmp->data->lgth;
-	      
-	    } else {
-	    }
-	    
-	  
-	    ltmp=ltmp->next;
-	    
-	  }
-	  //add the last entity
-	  addSpecificEntities(analysis,lg, currentStr , currentEN, positionDebut,(lastPos+lastLength)-positionDebut);
-	}
 
 	deleteList(ll);
+	
+
+	return outp;
 	
 }
 
