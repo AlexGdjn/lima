@@ -443,10 +443,14 @@ xmlOutputVertices(std::ostream& out,
     // if several interpretation of the token (i.e several LinguisticGraphVertex associated),
     // it is not a specific entity, => then just print all interpretations
     else if ((*it).second.size()>1) {
-      for (vector<LinguisticGraphVertex>::const_iterator  d=(*it).second.begin(),
-             d_end=(*it).second.end(); d!=d_end; d++) {
-	xmlOutputVertexInfos(out,*d,posgraph,offset);
-      }
+      //for (vector<LinguisticGraphVertex>::const_iterator  d=(*it).second.begin(),
+      //       d_end=(*it).second.end(); d!=d_end; d++) {
+      //xmlOutputVertexInfos(out,*d,posgraph,offset);
+      //}
+      
+      // we take only the first path to avoid ambiguity
+      xmlOutputVertexInfos(out,*((*it).second.begin()),posgraph,offset);
+      
     }
     else {
       xmlOutputVertex(out,(*it).second[0],anagraph,posgraph,annotationData,sp,offset);
